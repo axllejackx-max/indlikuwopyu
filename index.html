@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Untuk Kamu 💌</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --pk1: #ff80b5;
+      --pk2: #f4a8cc;
+      --pk3: #fcd5e4;
+      --pk-deep: #d4498a;
+      --pk-dark: #1a0a12;
+      --pk-card: rgba(255,160,200,0.07);
+      --pk-border: rgba(255,128,181,0.25);
+      --pk-muted: #c87aaa;
+      --pk-glow: rgba(255,128,181,0.5);
+      --white: #fff8fc;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--pk-dark);
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--white);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* CURSOR */
+    .cursor {
+      position: fixed; width: 12px; height: 12px;
+      background: var(--pk1); border-radius: 50%;
+      pointer-events: none; z-index: 99999;
+      transform: translate(-50%,-50%);
+      mix-blend-mode: screen;
+    }
+    .cursor-trail {
+      position: fixed; width: 28px; height: 28px;
+      border: 1.5px solid var(--pk1); border-radius: 50%;
+      pointer-events: none; z-index: 99998;
+      transform: translate(-50%,-50%);
+      opacity: 0.45; mix-blend-mode: screen;
+      transition: all 0.13s ease;
+    }
+
+    /* LOADER */
+    #loader {
+      position: fixed; inset: 0;
+      background: var(--pk-dark);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9999;
+      transition: opacity 1s ease, visibility 1s ease;
+    }
+    #loader.hide { opacity: 0; visibility: hidden; }
+    .loader-heart { font-size: 64px; animation: ldPulse 0.9s ease-in-out infinite; }
+    .loader-dots { display: flex; gap: 8px; margin-top: 20px; }
+    .loader-dot {
+      width: 8px; height: 8px;
+      background: var(--pk1); border-radius: 50%;
+      animation: ldBounce 1.2s ease-in-out infinite;
+    }
+    .loader-dot:nth-child(2) { animation-delay: 0.2s; background: var(--pk2); }
+    .loader-dot:nth-child(3) { animation-delay: 0.4s; background: var(--pk3); }
+    .loader-label {
+      margin-top: 16px;
+      font-family: 'Dancing Script', cursive;
+      color: var(--pk2); font-size: 1.3rem; letter-spacing: 3px;
+      animation: ldFade 1.6s ease-in-out infinite;
+    }
+    @keyframes ldPulse  { 0%,100%{transform:scale(1)} 50%{transform:scale(1.35)} }
+    @keyframes ldBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+    @keyframes ldFade   { 0%,100%{opacity:.3} 50%{opacity:1} }
+
+    /* SCROLL BAR */
+    #scrollBar {
+      position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+      background: linear-gradient(90deg, var(--pk-deep), var(--pk1), var(--pk2));
+      z-index: 9998; transition: width 0.1s linear;
+      box-shadow: 0 0 10px var(--pk-glow);
+    }
+
+    /* ═══ MUSIC PLAYER ═══ */
+    #musicPlayer {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%);
+      width: min(340px, 90vw);
+      background: rgba(26,10,18,0.82);
+      border: 1px solid var(--pk-border);
+      border-radius: 22px;
+      padding: 16px 20px 14px;
+      backdrop-filter: blur(24px);
+      z-index: 1000;
+      box-shadow: 0 8px 40px rgba(255,128,181,0.22), 0 0 0 1px rgba(255,255,255,0.04);
+      transition: transform 0.45s cubic-bezier(.34,1.56,.64,1), opacity 0.4s ease;
+    }
+    #musicPlayer.hidden {
+      transform: translateX(-50%) translateY(130%);
+      opacity: 0; pointer-events: none;
+    }
+    .mp-fab {
+      position: fixed; bottom: 24px; right: 24px;
+      width: 50px; height: 50px;
+      background: rgba(26,10,18,0.85);
+      border: 1px solid var(--pk-border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 1001;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(255,128,181,0.3);
+      overflow: visible;
+    }
+    .mp-fab:hover { transform: scale(1.12); box-shadow: 0 6px 28px var(--pk-glow); }
+    .mp-fab span { font-size: 22px; z-index: 1; }
+    .mp-fab-ring {
+      position: absolute; border-radius: 50%;
+      border: 1px solid var(--pk1);
+      animation: fabRipple 2s linear infinite;
+      pointer-events: none;
+    }
+    .mp-fab-ring:nth-child(1) { animation-delay: 0s; }
+    .mp-fab-ring:nth-child(2) { animation-delay: 0.9s; }
+    @keyframes fabRipple {
+      0%   { width: 50px; height: 50px; opacity: 0.7; top: 0; left: 0; }
+      100% { width: 110px; height: 110px; opacity: 0; top: -30px; left: -30px; }
+    }
+
+    /* player header */
+    .mp-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .mp-disc-wrap { position: relative; flex-shrink: 0; }
+    .mp-disc {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--pk-deep), var(--pk1), var(--pk2), var(--pk-deep));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      animation: discSpin 8s linear infinite;
+      animation-play-state: paused;
+      box-shadow: 0 0 16px rgba(255,128,181,0.5);
+    }
+    .mp-disc.spinning { animation-play-state: running; }
+    @keyframes discSpin { to { transform: rotate(360deg); } }
+    .mp-disc-center {
+      position: absolute; top:50%; left:50%;
+      transform: translate(-50%,-50%);
+      width: 14px; height: 14px;
+      background: var(--pk-dark); border-radius: 50%;
+      border: 1.5px solid var(--pk1);
+    }
+    .mp-info { flex: 1; min-width: 0; }
+    .mp-song-name {
+      font-family: 'Dancing Script', cursive;
+      color: var(--pk1); font-size: 1.05rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .mp-sub { color: var(--pk-muted); font-size: 0.75rem; letter-spacing: 1.5px; margin-top: 2px; }
+    .mp-eq { display: flex; align-items: flex-end; gap: 2.5px; height: 20px; }
+    .mp-eq-bar {
+      width: 3px; border-radius: 2px;
+      background: linear-gradient(to top, var(--pk-deep), var(--pk1));
+      animation: eqAnim var(--eq-dur,0.5s) ease-in-out infinite alternate;
+      animation-play-state: paused;
+    }
+    .mp-eq-bar.on { animation-play-state: running; }
+    @keyframes eqAnim {
+      from { height: 3px; opacity:0.4; }
+      to   { height: var(--eq-h, 16px); opacity:1; }
+    }
+
+    /* progress */
+    .mp-prog-wrap {
+      position: relative; height: 5px;
+      background: rgba(255,128,181,0.15);
+      border-radius: 5px; margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .mp-prog-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--pk-deep), var(--pk1));
+      border-radius: 5px; transition: width 0.3s linear;
+      box-shadow: 0 0 8px var(--pk-glow);
+      position: relative;
+    }
+    .mp-prog-thumb {
+      position: absolute; right: -5px; top: 50%;
+      transform: translateY(-50%);
+      width: 11px; height: 11px;
+      background: var(--pk1); border-radius: 50%;
+      box-shadow: 0 0 8px var(--pk1);
+    }
+    .mp-times {
+      display: flex; justify-content: space-between;
+      font-size: 0.68rem; color: var(--pk-muted);
+      letter-spacing: 0.5px; margin-bottom: 12px;
+    }
+
+    /* controls */
+    .mp-ctrl { display: flex; align-items: center; justify-content: center; gap: 22px; }
+    .mp-icon-btn {
+      background: none; border: none;
+      color: var(--pk-muted); font-size: 16px;
+      cursor: pointer; padding: 6px;
+      transition: color 0.2s, transform 0.2s;
+      display: flex; align-items: center;
+      }
+    .mp-icon-btn:hover { color: var(--pk1); transform: scale(1.25); }
+    .mp-play-btn {
+      width: 46px; height: 46px;
+      background: linear-gradient(135deg, var(--pk-deep), var(--pk1));
+      border: none; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 18px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 18px rgba(255,128,181,0.55);
+    }
+    .mp-play-btn:hover { transform: scale(1.12); box-shadow: 0 6px 28px var(--pk-glow); }
+
+    /* volume */
+    .mp-vol { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+    .mp-vol-icon { font-size: 13px; color: var(--pk-muted); }
+    .mp-vol-range {
+      flex: 1; -webkit-appearance: none; appearance: none;
+      height: 3px; border-radius: 3px;
+      background: rgba(255,128,181,0.2); outline: none; cursor: pointer;
+    }
+    .mp-vol-range::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 12px; height: 12px;
+      background: var(--pk1); border-radius: 50%;
+      box-shadow: 0 0 6px var(--pk-glow); cursor: pointer;
+    }
+
+    /* STARS */
+    .stars-bg { position: fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+    .star {
+      position: absolute; background: var(--pk3); border-radius: 50%;
+      animation: twinkle var(--dur) ease-in-out infinite var(--delay);
+    }
+    @keyframes twinkle {
+      0%,100%{opacity:0.08;transform:scale(1)}
+      50%{opacity:1;transform:scale(1.6)}
+    }
+
+    /* PETALS */
+    .petal { position:fixed; top:-30px; pointer-events:none; z-index:1; animation:petalFall linear infinite; }
+    @keyframes petalFall {
+      0%  {transform:translateY(0) rotate(0deg) translateX(0);opacity:.9}
+      25% {transform:translateY(25vh) rotate(90deg) translateX(35px)}
+      50% {transform:translateY(50vh) rotate(180deg) translateX(-25px)}
+      75% {transform:translateY(75vh) rotate(270deg) translateX(20px)}
+      100%{transform:translateY(110vh) rotate(360deg) translateX(0);opacity:0}
+    }
+
+    /* FLOAT HEARTS */
+    .float-heart { position:fixed; pointer-events:none; z-index:1; animation:floatUp linear infinite; opacity:0; }
+    @keyframes floatUp {
+      0%  {transform:translateY(100vh) scale(0);opacity:0}
+      8%  {opacity:.8}
+      92% {opacity:.4}
+      100%{transform:translateY(-10vh) scale(1.1);opacity:0}
+    }
+
+    /* SPARKLE */
+    .sparkle { position:fixed; pointer-events:none; z-index:9000; animation:sparkAnim 0.7s ease-out forwards; }
+    @keyframes sparkAnim {
+      0%  {transform:scale(0) rotate(0deg);opacity:1}
+      100%{transform:scale(1.5) rotate(200deg);opacity:0}
+    }
+
+    /* WRAPPER */
+    #main-wrapper { position:relative; z-index:2; opacity:0; animation:fadeIn 1.5s ease 0.5s forwards; }
+
+    /* HERO */
+    .hero {
+      min-height:100vh;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      text-align:center; padding:60px 24px;
+      position:relative;
+      background:radial-gradient(ellipse 70% 55% at 50% 30%, rgba(212,73,138,0.2) 0%, transparent 70%);
+    }
+    .hero-label {
+      font-family:'Dancing Script',cursive;
+      color:var(--pk1); font-size:1.1rem; letter-spacing:5px;
+      opacity:0; animation:slideDown 1s ease 1s forwards;
+    }
+    .hero-title {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(3.5rem,10vw,8rem);
+      color:var(--white); font-style:italic; line-height:1.1;
+      margin:16px 0;
+      opacity:0; animation:slideUp 1.2s ease 1.3s forwards;
+      text-shadow:0 0 60px rgba(255,128,181,0.55);
+    }
+    .hero-sub {
+      color:var(--pk-muted); font-size:1rem;
+      letter-spacing:7px; text-transform:uppercase;
+      opacity:0; animation:slideUp 1.2s ease 1.6s forwards;
+    }
+    .hero-divider {
+      width:0; height:1px;
+      background:linear-gradient(90deg,transparent,var(--pk1),transparent);
+      margin:28px auto;
+      opacity:0; animation:expandDiv 1.5s ease 2s forwards;
+    }
+    .scroll-hint {
+      position:absolute; bottom:40px;
+      display:flex; flex-direction:column; align-items:center; gap:8px;
+      opacity:0; animation:fadeIn 1s ease 3s forwards;
+    }
+    .scroll-hint span { font-family:'Dancing Script',cursive; color:var(--pk-muted); font-size:.9rem; }
+    .scroll-arrow {
+      width:18px; height:18px;
+      border-right:1px solid var(--pk-muted); border-bottom:1px solid var(--pk-muted);
+      transform:rotate(45deg);
+      animation:bounceArr 1.5s ease-in-out infinite;
+    }
+    .bokeh {
+      position:absolute; border-radius:50%;
+      pointer-events:none; filter:blur(60px); opacity:0.13;
+      animation:bokehDrift ease-in-out infinite;
+    }
+    @keyframes bokehDrift {
+      0%,100%{transform:translate(0,0) scale(1)}
+      50%{transform:translate(30px,-20px) scale(1.2)}
+    }
+
+    /* PHOTO SECTION */
+    .photo-section {
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      padding:80px 20px; position:relative;
+      background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(212,73,138,0.1) 0%,transparent 70%);
+    }
+    .photo-wrapper { position:relative; display:flex; flex-direction:column; align-items:center; }
+    .photo-frame-outer {
+      position:relative; width:min(400px,82vw);
+      padding:4px;
+      background:linear-gradient(135deg,var(--pk-deep),var(--pk1),var(--pk2),var(--pk-deep));
+      border-radius:4px;
+      opacity:0; transform:scale(0.88);
+      transition:opacity 1.1s ease, transform 1.1s cubic-bezier(.34,1.56,.64,1);
+      animation:frameGlow 3s ease-in-out infinite;
+    }
+    .photo-frame-outer.visible { opacity:1; transform:scale(1); }
+    @keyframes frameGlow {
+      0%,100%{box-shadow:0 0 25px rgba(255,128,181,0.4),0 0 60px rgba(212,73,138,0.2)}
+      50%{box-shadow:0 0 50px rgba(255,128,181,0.7),0 0 100px rgba(212,73,138,0.4)}
+      }
+    .photo-frame-inner { background:var(--pk-dark); padding:14px; border-radius:2px; }
+    .photo-frame-inner img {
+      width:100%; display:block;
+      object-fit:cover; aspect-ratio:3/4;
+      filter:brightness(1.03) saturate(1.1);
+    }
+    .photo-corner {
+      position:absolute; width:26px; height:26px;
+      border-color:var(--pk1); border-style:solid;
+    }
+    .photo-corner.tl{top:-5px;left:-5px;border-width:2px 0 0 2px}
+    .photo-corner.tr{top:-5px;right:-5px;border-width:2px 2px 0 0}
+    .photo-corner.bl{bottom:-5px;left:-5px;border-width:0 0 2px 2px}
+    .photo-corner.br{bottom:-5px;right:-5px;border-width:0 2px 2px 0}
+    .photo-fallback {
+      width:100%; aspect-ratio:3/4;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      background:linear-gradient(135deg,rgba(255,128,181,0.1),rgba(26,10,18,0.8));
+      gap:14px;
+    }
+    .photo-fallback .pf-icon { font-size:4rem; }
+    .photo-fallback .pf-text {
+      font-family:'Cormorant Garamond',serif;
+      color:var(--pk-muted); font-size:.9rem; text-align:center; padding:0 16px;
+    }
+    .photo-caption {
+      margin-top:28px;
+      font-family:'Dancing Script',cursive;
+      color:var(--pk1); font-size:1.5rem; letter-spacing:2px;
+      opacity:0; transition:opacity 1.2s ease 0.4s;
+    }
+    .photo-caption.visible { opacity:1; }
+    .orb-heart {
+      position:absolute; font-size:20px;
+      animation:orbit var(--orb-dur) linear infinite var(--orb-delay);
+      top:50%; left:50%; transform-origin:0 0;
+    }
+    @keyframes orbit {
+      0%  {transform:rotate(var(--orb-start)) translateX(var(--orb-r)) scale(.8);opacity:.4}
+      50% {transform:rotate(calc(var(--orb-start) + 180deg)) translateX(var(--orb-r)) scale(1.2);opacity:1}
+      100%{transform:rotate(calc(var(--orb-start) + 360deg)) translateX(var(--orb-r)) scale(.8);opacity:.4}
+    }
+
+    /* LETTER SECTION */
+    .letter-section {
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:center;
+      padding:80px 20px; position:relative;
+    }
+    .letter-envelope { width:min(680px,94vw); position:relative; }
+    .envelope-top {
+      text-align:center; margin-bottom:38px;
+      opacity:0; transition:opacity 1s ease;
+    }
+    .envelope-top.visible { opacity:1; }
+    .env-label {
+      font-family:'Dancing Script',cursive;
+      color:var(--pk1); font-size:1rem; letter-spacing:4px;
+    }
+    .env-title {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(2rem,5vw,3.2rem);
+      color:var(--white); font-style:italic; margin-top:8px;
+    }
+    .env-line {
+      width:70px; height:1px;
+      background:linear-gradient(90deg,transparent,var(--pk1),transparent);
+      margin:14px auto 0;
+    }
+    .letter-paper {
+      background:linear-gradient(160deg,rgba(255,128,181,0.05) 0%,rgba(212,73,138,0.07) 100%);
+      border:1px solid var(--pk-border);
+      border-radius:2px;
+      padding:clamp(28px,6vw,56px) clamp(22px,6vw,56px);
+      position:relative; backdrop-filter:blur(4px);
+      opacity:0; transform:translateY(30px);
+      transition:opacity 1s ease 0.3s, transform 1s ease 0.3s;
+    }
+    .letter-paper.visible { opacity:1; transform:translateY(0); }
+    .letter-paper::before {
+      content:'';
+      position:absolute; left:56px; top:0; bottom:0; width:1px;
+      background:rgba(255,128,181,0.12);
+    }
+    .letter-paper::after {
+      content:'"';
+      position:absolute; top:-18px; left:50%;
+      transform:translateX(-50%);
+      font-family:'Playfair Display',serif;
+      font-size:5.5rem; color:var(--pk1); opacity:0.15; line-height:1;
+    }
+    .letter-salutation {
+      font-family:'Dancing Script',cursive;
+      color:var(--pk1); font-size:1.4rem; margin-bottom:22px;
+      opacity:0; transition:opacity 0.8s ease;
+    }
+    .letter-salutation.visible { opacity:1; }
+    .letter-paragraph {
+      color:rgba(255,248,252,0.82); font-size:clamp(1rem,2.5vw,1.18rem);
+      line-height:2.1; margin-bottom:22px; letter-spacing:.3px;
+      opacity:0; transform:translateX(-18px);
+      transition:opacity .9s ease, transform .9s ease;
+    }
+    .letter-paragraph.visible { opacity:1; transform:translateX(0); }
+    .letter-paragraph .hl { color:var(--pk1); font-style:italic; }
+    .letter-signature {
+      margin-top:38px; text-align:right;
+      opacity:0; transition:opacity 1s ease .5s;
+    }
+    .letter-signature.visible { opacity:1; }
+    .sig-label { color:var(--pk-muted); font-size:.95rem; letter-spacing:2px; }
+    .sig-name {
+      font-family:'Dancing Script',cursive;
+      color:var(--pk1); font-size:2.2rem; line-height:1.3;
+    }
+    .stamp {
+      position:absolute; bottom:22px; right:22px;
+      width:54px; height:54px;
+      border:2px dashed var(--pk-deep);
+      display:flex; align-items:center; justify-content:center;
+      border-radius:4px; font-size:26px; opacity:.4;
+      animation:stampPulse 2.2s ease-in-out infinite;
+    }
+    @keyframes stampPulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.65;transform:scale(1.06)}}
+
+    /* TIMELINE */
+    .timeline-section { padding:80px 20px; display:flex; flex-direction:column; align-items:center; }
+    .section-heading { text-align:center; margin-bottom:56px; }
+    .sh-label { font-family:'Dancing Script',cursive; color:var(--pk1); font-size:1rem; letter-spacing:4px; }
+    .sh-title { font-family:'Playfair Display',serif; font-size:clamp(2rem,4vw,3rem); color:var(--white); font-style:italic; margin-top:8px; }
+    .sh-line { width:56px; height:1px; background:linear-gradient(90deg,transparent,var(--pk1),transparent); margin:12px auto 0; }
+    .timeline { width:min(620px,94vw); position:relative; }
+    .timeline::before {
+      content:''; position:absolute;
+      left:50%; top:0; bottom:0; width:1px;
+      background:linear-gradient(to bottom,transparent,var(--pk-deep),var(--pk-deep),transparent);
+      transform:translateX(-50%);
+    }
+    .tl-item {
+      display:flex; align-items:center; margin-bottom:48px;
+      opacity:0; transition:opacity .9s ease, transform .9s ease;
+    }
+    .tl-item:nth-child(odd)  { flex-direction:row-reverse; transform:translateX(40px); }
+    .tl-item:nth-child(even) { transform:translateX(-40px); }
+    .tl-item.visible { opacity:1; transform:translateX(0)!important; }
+    .tl-content {
+      width:44%;
+      background:var(--pk-card); border:1px solid var(--pk-border);
+      padding:18px 22px; border-radius:2px;
+    }
+    .tl-item:nth-child(odd) .tl-content { text-align:right; }
+    .tl-emoji { font-size:1.5rem; margin-bottom:5px; }
+    .tl-title { font-family:'Playfair Display',serif; color:var(--white); font-size:1rem; font-style:italic; }
+    .tl-desc { color:var(--pk-muted); font-size:.88rem; margin-top:4px; line-height:1.65; }
+    .tl-dot { width:12%; display:flex; justify-content:center; align-items:center; flex-shrink:0; }
+    .tl-dot-inner {
+      width:13px; height:13px;
+      background:var(--pk-deep); border-radius:50%;
+      border:2px solid var(--pk-dark);
+      box-shadow:0 0 0 4px var(--pk-deep),0 0 16px var(--pk1);
+      animation:dotPulse 2s ease-in-out infinite;
+    }
+    @keyframes dotPulse{
+      0%,100%{box-shadow:0 0 0 4px rgba(212,73,138,.4),0 0 16px rgba(255,128,181,.4)}
+      50%{box-shadow:0 0 0 8px rgba(212,73,138,.2),0 0 28px rgba(255,128,181,.8)}
+    }
+
+    /* PROMISE SECTION */
+    .promise-section { padding:80px 20px; display:flex; flex-direction:column; align-items:center; }
+    .promise-grid {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:22px; width:min(780px,94vw); margin-top:14px;
+    }
+    .promise-card {
+      background:var(--pk-card); border:1px solid var(--pk-border);
+      padding:30px 22px; text-align:center; border-radius:3px;
+      cursor:default;
+      opacity:0; transform:translateY(28px);
+      transition:opacity .8s ease, transform .8s ease, border-color .3s, background .3s;
+      position:relative; overflow:hidden;
+    }
+    .promise-card::before {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(135deg,rgba(255,128,181,0.1),transparent);
+      opacity:0; transition:opacity .4s;
+    }
+    .promise-card:hover::before { opacity:1; }
+    .promise-card:hover { border-color:rgba(255,128,181,.5); background:rgba(255,128,181,.1); }
+    .promise-card.visible { opacity:1; transform:translateY(0); }
+    .promise-icon {
+      font-size:2.4rem; margin-bottom:12px; display:block;
+      animation:iconFloat 3s ease-in-out infinite var(--ic-d,0s);
+    }
+    @keyframes iconFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .promise-title { font-family:'Playfair Display',serif; color:var(--white); font-size:1rem; font-style:italic; margin-bottom:8px; }
+    .promise-text { color:var(--pk-muted); font-size:.9rem; line-height:1.75; }
+
+    /* CLOSING */
+    .closing-section {
+      min-height:80vh; display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      padding:80px 20px; text-align:center; position:relative;
+    }
+    .closing-heart-wrap { position:relative; margin-bottom:36px; }
+    .big-heart {
+      font-size:clamp(80px,14vw,128px); display:block;
+      animation:bigBeat 1.2s ease-in-out infinite;
+      filter:drop-shadow(0 0 32px rgba(255,128,181,.8));
+    }
+    @keyframes bigBeat{0%,100%{transform:scale(1)}14%{transform:scale(1.13)}28%{transform:scale(1)}42%{transform:scale(1.08)}70%{transform:scale(1)}}
+    .heart-ring {
+      position:absolute; border-radius:50%;
+      border:1px solid var(--pk1);
+      top:50%; left:50%; transform:translate(-50%,-50%);
+      animation:heartRipple 2s linear infinite;
+    }
+    .heart-ring:nth-child(2){animation-delay:.65s}
+    .heart-ring:nth-child(3){animation-delay:1.3s}
+    @keyframes heartRipple{0%{width:80px;height:80px;opacity:.8}100%{width:240px;height:240px;opacity:0}}
+    .closing-quote {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(1.7rem,4.5vw,3rem);
+      color:var(--white); font-style:italic;
+      max-width:580px; line-height:1.45; margin-bottom:18px;
+      opacity:0; transition:opacity 1.2s ease;
+    }
+    .closing-quote.visible { opacity:1; }
+    .closing-sub {
+      color:var(--pk-muted); font-size:.95rem;
+      letter-spacing:5px; text-transform:uppercase;
+      opacity:0; transition:opacity 1.2s ease .4s;
+    }
+    .closing-sub.visible { opacity:1; }
+    .closing-dots { display:flex; gap:10px; margin:28px 0; }
+    .closing-dot {
+      width:6px; height:6px; background:var(--pk1);
+      border-radius:50%; opacity:.4;
+      animation:dotBlink 1.5s ease-in-out infinite;
+    }
+    .closing-dot:nth-child(2){animation-delay:.3s}
+    .closing-dot:nth-child(3){animation-delay:.6s}
+    @keyframes dotBlink{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:1;transform:scale(1.6)}}
+    .closing-forever {
+      font-family:'Dancing Script',cursive;
+      color:var(--pk1); font-size:clamp(2rem,6vw,4rem);
+      animation:glowPulse 2s ease-in-out infinite;
+      opacity:0; transition:opacity 1.2s ease .8s;
+    }
+    .closing-forever.visible { opacity:1; }
+    @keyframes glowPulse{0%,100%{text-shadow:0 0 20px rgba(255,128,181,.5)}50%{text-shadow:0 0 50px rgba(255,128,181,1),0 0 90px rgba(212,73,138,.5)}}
+
+    /* NOISE + VIGNETTE */
+    .noise {
+      position:fixed; inset:0;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity:.03; pointer-events:none; z-index:3;
+    }
+    .vignette {
+      position:fixed; inset:0;
+      background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.6) 100%);
+      pointer-events:none; z-index:2;
+    }
+
+    /* KEYFRAMES GLOBAL */
+    @keyframes fadeIn    { from{opacity:0} to{opacity:1} }
+    @keyframes slideDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes slideUp   { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes expandDiv { from{opacity:0;width:0} to{opacity:1;width:120px} }
+    @keyframes bounceArr { 0%,100%{transform:rotate(45deg) translateY(0)} 50%{transform:rotate(45deg) translateY(6px)} }
+
+    /* MOBILE */
+    @media(max-width:580px){
+      .timeline::before{left:22px}
+      .tl-item{flex-direction:column!important;align-items:flex-start;padding-left:46px}
+      .tl-item:nth-child(odd){transform:translateX(16px)}
+      .tl-item:nth-child(even){transform:translateX(-16px)}
+      .tl-content{width:100%;text-align:left!important}
+      .tl-dot{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-trail" id="cursorTrail"></div>
+<div class="noise"></div>
+<div class="vignette"></div>
+<div id="scrollBar"></div>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-heart">💌</div>
+  <div class="loader-dots">
+    <div class="loader-dot"></div>
+    <div class="loader-dot"></div>
+    <div class="loader-dot"></div>
+  </div>
+  <div class="loader-label">menyiapkan sesuatu untukmu...</div>
+</div>
+
+<!-- MUSIC FAB -->
+<div class="mp-fab" id="mpFab">
+  <div class="mp-fab-ring"></div>
+  <div class="mp-fab-ring"></div>
+  <span>🎵</span>
+</div>
+
+<!-- MUSIC PLAYER -->
+<div id="musicPlayer">
+  <div class="mp-head">
+    <div class="mp-disc-wrap">
+      <div class="mp-disc" id="mpDisc">🌸</div>
+      <div class="mp-disc-center"></div>
+    </div>
+    <div class="mp-info">
+      <div class="mp-song-name">About You</div>
+      <div class="mp-sub">for you · always</div>
+    </div>
+    <div class="mp-eq" id="mpEq">
+      <div class="mp-eq-bar" style="--eq-dur:.4s;--eq-h:16px"></div>
+      <div class="mp-eq-bar" style="--eq-dur:.6s;--eq-h:10px"></div>
+      <div class="mp-eq-bar" style="--eq-dur:.5s;--eq-h:18px"></div>
+      <div class="mp-eq-bar" style="--eq-dur:.35s;--eq-h:8px"></div>
+      <div class="mp-eq-bar" style="--eq-dur:.7s;--eq-h:14px"></div>
+    </div>
+  </div>
+
+  <div class="mp-prog-wrap" id="mpProgWrap">
+    <div class="mp-prog-fill" id="mpFill">
+      <div class="mp-prog-thumb"></div>
+    </div>
+  </div>
+  <div class="mp-times">
+    <span id="mpCur">0:00</span>
+    <span id="mpDur">0:00</span>
+  </div>
+
+  <div class="mp-ctrl">
+    <button class="mp-icon-btn" id="mpLoop" title="Loop">🔁</button>
+    <button class="mp-play-btn" id="mpPlay">▶️</button>
+    <button class="mp-icon-btn" id="mpMute" title="Mute">🔊</button>
+  </div>
+
+  <div class="mp-vol">
+    <span class="mp-vol-icon">🔈</span>
+    <input type="range" class="mp-vol-range" id="mpVol" min="0" max="1" step="0.01" value="0.6"/>
+    <span class="mp-vol-icon">🔊</span>
+  </div>
+</div>
+
+<!-- AUDIO -->
+<audio id="bgMusic" loop>
+  <source src="about you.mp3" type="audio/mpeg"/>
+</audio>
+
+<!-- STARS -->
+<div class="stars-bg" id="starsBg"></div>
+
+<!-- MAIN -->
+<div id="main-wrapper">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="bokeh" style="width:300px;height:300px;background:var(--pk1);top:10%;left:5%;--spd:7s;animation-duration:7s;"></div>
+    <div class="bokeh" style="width:200px;height:200px;background:var(--pk-deep);bottom:15%;right:8%;--spd:9s;animation-duration:9s;animation-delay:-3s;"></div>
+    <p class="hero-label">sebuah pesan dari hati</p>
+    <h1 class="hero-title">Untuk Kamu</h1>
+    <p class="hero-sub">yang selalu ada</p>
+    <div class="hero-divider"></div>
+    <div class="scroll-hint">
+      <span>scroll ke bawah</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- PHOTO -->
+  <section class="photo-section">
+    <div class="photo-wrapper">
+      <div id="orbitWrap" style="position:absolute;inset:-60px;pointer-events:none;"></div>
+      <div class="photo-frame-outer" id="photoFrame">
+        <div class="photo-corner tl"></div><div class="photo-corner tr"></div>
+        <div class="photo-corner bl"></div><div class="photo-corner br"></div>
+        <div class="photo-frame-inner">
+          <img src="kita.jpeg" alt="Kita" id="mainPhoto"
+               onerror="this.style.display='none';document.getElementById('pFallback').style.display='flex'"/>
+          <div class="photo-fallback" id="pFallback" style="display:none;">
+            <span class="pf-icon">📷</span>
+            <span class="pf-text">Taruh foto "kita.jpeg"<br/>di folder yang sama</span>
+          </div>
+        </div>
+      </div>
+      <p class="photo-caption" id="photoCaption">kita 🌸</p>
+    </div>
+  </section>
+
+  <!-- LETTER -->
+  <section class="letter-section">
+    <div class="letter-envelope">
+      <div class="envelope-top" id="envTop">
+        <p class="env-label">surat kecilku</p>
+        <h2 class="env-title">Sepatah Kata</h2>
+        <div class="env-line"></div>
+      </div>
+      <div class="letter-paper" id="letterPaper">
+        <p class="letter-salutation" id="letterSal">Untukmu,</p>
+        <p class="letter-paragraph" id="p1">
+          aku cuma mau bilang <span class="hl">terima kasih</span>… bukan cuma buat hal‑hal besar yang keliatan,
+          tapi juga buat semua hal kecil yang mungkin orang lain ga sadar, tapi aku ngerasain banget.
+        </p>
+        <p class="letter-paragraph" id="p2">
+          terima kasih udah <span class="hl">sabar sama aku</span> sejauh ini. sabar waktu aku lagi nyebelin,
+          lagi banyak pikiran, atau lagi ga jadi versi terbaik dari diriku sendiri.
+          kamu tetep milih buat <span class="hl">stay</span>, bukan cuma pas gampangnya doang, tapi juga pas ribetnya.
+        </p>
+        <p class="letter-paragraph" id="p3">
+          aku juga bersyukur banget kamu mau jadi <span class="hl">bagian dari hidup aku</span>.
+          dari sekian banyak kemungkinan, kamu yang sekarang ada di samping aku,
+          nemenin hari‑hari aku, dengerin cerita aku, dan pelan‑pelan jadi
+          <span class="hl">partner hidup yang selalu aku harapin</span>.
+        </p>
+        <p class="letter-paragraph" id="p4">
+          aku tau aku belum sempurna, masih banyak kurangnya,
+          tapi aku bakal terus belajar buat jadi seseorang yang
+          <span class="hl">pantes buat kamu perjuangin juga</span>.
+        </p>
+        <p class="letter-paragraph" id="p5">
+          intinya… makasih ya udah mau sampai di titik ini bareng aku.
+          semoga kita bisa terus jalan, <span class="hl">ga harus selalu mulus, tapi selalu bareng</span>.
+        </p>
+        <div class="letter-signature" id="letterSig">
+          <p class="sig-label">dengan sepenuh hati,</p>
+          <p class="sig-name">wopyuuu 💗</p>
+        </div>
+        <div class="stamp">💌</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="timeline-section">
+    <div class="section-heading">
+      <p class="sh-label">kenangan kita</p>
+      <h2 class="sh-title">Setiap Momen Berarti</h2>
+      <div class="sh-line"></div>
+    </div>
+    <div class="timeline">
+      <div class="tl-item" data-tl>
+        <div class="tl-content">
+          <div class="tl-emoji">✨</div>
+          <div class="tl-title">Saat Pertama Kenal</div>
+          <div class="tl-desc">aneh ya, dari yang awalnya cuma saling tau, sekarang malah jadi yang paling sering kepikiran.</div>
+        </div>
+        <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+        <div class="tl-content" style="visibility:hidden"></div>
+      </div>
+      <div class="tl-item" data-tl>
+        <div class="tl-content" style="visibility:hidden"></div>
+        <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+        <div class="tl-content">
+          <div class="tl-emoji">💬</div>
+          <div class="tl-title">Obrolan yang Ga Ada Habisnya</div>
+          <div class="tl-desc">dari yang receh sampe yang serius, selalu enak aja kalo sama kamu. kadang ga penting, tapi tetep berkesan.</div>
+        </div>
+      </div>
+      <div class="tl-item" data-tl>
+        <div class="tl-content">
+          <div class="tl-emoji">🌙</div>
+          <div class="tl-title">Malam‑Malam Bareng</div>
+          <div class="tl-desc">entah diam bareng atau ribut kecil‑kecilan, semua itu aku kangenin kalau udah jauh.</div>
+        </div>
+        <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+        <div class="tl-content" style="visibility:hidden"></div>
+      </div>
+      <div class="tl-item" data-tl>
+        <div class="tl-content" style="visibility:hidden"></div>
+        <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+        <div class="tl-content">
+          <div class="tl-emoji">🤝</div>
+          <div class="tl-title">Saat Susah Sekalipun</div>
+          <div class="tl-desc">kamu ga pergi. itu yang bikin aku tau, kamu beda dari yang lain.</div>
+        </div>
+      </div>
+      <div class="tl-item" data-tl>
+        <div class="tl-content">
+          <div class="tl-emoji">🌸</div>
+          <div class="tl-title">Sekarang & Ke Depannya</div>
+          <div class="tl-desc">aku ga tau pasti apa yang ada di depan, tapi selama bareng kamu, aku ga takut.</div>
+        </div>
+        <div class="tl-dot"><div class="tl-dot-inner"></div></div>
+        <div class="tl-content" style="visibility:hidden"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMISES -->
+  <section class="promise-section">
+    <div class="section-heading">
+      <p class="sh-label">yang aku pegang buat kamu</p>
+      <h2 class="sh-title">Yang Aku Pegang Untukmu</h2>
+      <div class="sh-line"></div>
+    </div>
+    <div class="promise-grid">
+      <div class="promise-card" data-pc>
+        <span class="promise-icon" style="--ic-d:0s">🛡️</span>
+        <div class="promise-title">Selalu Ada</div>
+        <div class="promise-text">di waktu kamu butuh ditemenin, aku bakal usahain ada. ga harus selalu bener, tapi selalu dengerin.</div>
+      </div>
+      <div class="promise-card" data-pc>
+        <span class="promise-icon" style="--ic-d:.25s">💪</span>
+        <div class="promise-title">Terus Tumbuh</div>
+        <div class="promise-text">aku ga janji jadi paling sempurna, tapi aku bakal terus belajar jadi lebih baik buat kita.</div>
+      </div>
+      <div class="promise-card" data-pc>
+        <span class="promise-icon" style="--ic-d:.5s">👂</span>
+        <div class="promise-title">Dengerin Kamu</div>
+        <div class="promise-text">semua cerita kamu, sekecil apa pun itu, selalu punya tempat. aku suka dengerin kamu, sesimpel itu.</div>
+      </div>
+      <div class="promise-card" data-pc>
+        <span class="promise-icon" style="--ic-d:.75s">🔥</span>
+        <div class="promise-title">Jaga Perasaan</div>
+        <div class="promise-text">aku tau hati kamu bukan buat disakitin. jadi selama aku di sini, aku bakal jaga itu sebisa aku.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="closing-section">
+    <div class="closing-heart-wrap">
+      <div class="heart-ring"></div>
+      <div class="heart-ring"></div>
+      <div class="heart-ring"></div>
+      <span class="big-heart">💗</span>
+    </div>
+    <p class="closing-quote" id="closingQuote">"ga harus selalu mulus, tapi selalu bareng."</p>
+    <div class="closing-dots">
+      <div class="closing-dot"></div>
+      <div class="closing-dot"></div>
+      <div class="closing-dot"></div>
+    </div>
+    <p class="closing-sub" id="closingSub">untukmu, selalu</p>
+    <p class="closing-forever" id="closingForever">wopyuuu 💗</p>
+  </section>
+
+</div>
+
+<script>
+/* ── CURSOR ── */
+const cur  = document.getElementById('cursor');
+const trl  = document.getElementById('cursorTrail');
+let mx=0,my=0,tx=0,ty=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX; my=e.clientY;
+  cur.style.left=mx+'px'; cur.style.top=my+'px';
+});
+(function animTrl(){
+  tx+=(mx-tx)*.12; ty+=(my-ty)*.12;
+  trl.style.left=tx+'px'; trl.style.top=ty+'px';
+  requestAnimationFrame(animTrl);
+})();
+
+/* sparkle on click */
+document.addEventListener('click',e=>{
+  ['✨','💫','🌸','💗','⭐'].forEach((ch,i)=>{
+    const s=document.createElement('div');
+    s.className='sparkle';
+    s.textContent=ch;
+    s.style.cssText=`left:${e.clientX+(Math.random()-.5)*50}px;top:${e.clientY+(Math.random()-.5)*50}px;font-size:${12+Math.random()*14}px;animation-delay:${i*.06}s`;
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),800);
+  });
+});
+
+/* ── STARS ── */
+const sb=document.getElementById('starsBg');
+for(let i=0;i<200;i++){
+  const s=document.createElement('div');s.className='star';
+  const z=.5+Math.random()*2;
+  s.style.cssText=`width:${z}px;height:${z}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--dur:${2+Math.random()*5}s;--delay:${Math.random()*6}s`;
+  sb.appendChild(s);
+}
+document.addEventListener('mousemove',e=>{
+  const xp=(e.clientX/innerWidth-.5)*18,yp=(e.clientY/innerHeight-.5)*18;
+  sb.style.transform=`translate(${xp}px,${yp}px)`;
+});
+
+/* ── PETALS ── */
+const petalEmojis=['🌸','🌺','💮','🌷','🩷'];
+for(let i=0;i<24;i++){
+  const p=document.createElement('div');p.className='petal';
+  p.textContent=petalEmojis[Math.floor(Math.random()*petalEmojis.length)];
+  p.style.cssText=`left:${Math.random()*100}%;font-size:${11+Math.random()*13}px;animation-duration:${7+Math.random()*10}s;animation-delay:${Math.random()*13}s;opacity:${.3+Math.random()*.6}`;
+  document.body.appendChild(p);
+}
+
+/* ── FLOAT HEARTS ── */
+const heartEmoji=['💗','💓','💕','💖','🩷','💝'];
+for(let i=0;i<18;i++){
+  const h=document.createElement('div');h.className='float-heart';
+  h.textContent=heartEmoji[Math.floor(Math.random()*heartEmoji.length)];
+  h.style.cssText=`left:${Math.random()*100}%;font-size:${13+Math.random()*17}px;animation-duration:${8+Math.random()*11}s;animation-delay:${Math.random()*14}s`;
+  document.body.appendChild(h);
+}
+
+/* ── ORBITING HEARTS ── */
+const ow=document.getElementById('orbitWrap');
+[{e:'💌',r:'180px',d:'12s',dl:'0s',s:'0deg'},
+ {e:'🌸',r:'170px',d:'15s',dl:'-4s',s:'90deg'},
+ {e:'✨',r:'185px',d:'10s',dl:'-7s',s:'180deg'},
+ {e:'💗',r:'175px',d:'13s',dl:'-2s',s:'270deg'},
+ {e:'🩷',r:'178px',d:'18s',dl:'-9s',s:'45deg'}
+].forEach(o=>{
+  const el=document.createElement('div');
+  el.className='orb-heart';el.textContent=o.e;
+  el.style.cssText=`--orb-r:${o.r};--orb-dur:${o.d};--orb-delay:${o.dl};--orb-start:${o.s}`;
+  ow.appendChild(el);
+});
+
+/* ── MUSIC PLAYER ── */
+const music=document.getElementById('bgMusic');
+const mpDisc=document.getElementById('mpDisc');
+const mpFill=document.getElementById('mpFill');
+const mpCur=document.getElementById('mpCur');
+const mpDur=document.getElementById('mpDur');
+const mpPlay=document.getElementById('mpPlay');
+const mpVol=document.getElementById('mpVol');
+const mpLoop=document.getElementById('mpLoop');
+const mpMute=document.getElementById('mpMute');
+const mpProgWrap=document.getElementById('mpProgWrap');
+const eqBars=document.querySelectorAll('.mp-eq-bar');
+const mpFab=document.getElementById('mpFab');
+const mpPlayer=document.getElementById('musicPlayer');
+
+let playing=false,looping=true,muted=false;
+music.loop=true; music.volume=0.6;
+
+function fmt(s){
+  const m=Math.floor(s/60),sec=Math.floor(s%60);
+  return `${m}:${sec<10?'0':''}${sec}`;
+}
+function setPlaying(v){
+  playing=v;
+  mpPlay.textContent=v?'⏸️':'▶️';
+  mpDisc.classList.toggle('spinning',v);
+  eqBars.forEach(b=>b.classList.toggle('on',v));
+}
+mpPlay.addEventListener('click',()=>{
+  if(playing){music.pause();setPlaying(false);}
+  else{music.play().then(()=>setPlaying(true)).catch(()=>{});}
+});
+mpLoop.addEventListener('click',()=>{
+  looping=!looping; music.loop=looping;
+  mpLoop.style.opacity=looping?'1':'.4';
+});
+mpMute.addEventListener('click',()=>{
+  muted=!muted; music.muted=muted;
+  mpMute.textContent=muted?'🔇':'🔊';
+});
+mpVol.addEventListener('input',()=>{ music.volume=parseFloat(mpVol.value); });
+music.addEventListener('timeupdate',()=>{
+  if(!music.duration)return;
+  const pct=(music.currentTime/music.duration)*100;
+  mpFill.style.width=pct+'%';
+  mpCur.textContent=fmt(music.currentTime);
+});
+music.addEventListener('loadedmetadata',()=>{ mpDur.textContent=fmt(music.duration); });
+mpProgWrap.addEventListener('click',e=>{
+  if(!music.duration)return;
+  const r=mpProgWrap.getBoundingClientRect();
+  music.currentTime=((e.clientX-r.left)/r.width)*music.duration;
+});
+
+/* fab toggle */
+mpFab.addEventListener('click',()=>{
+  mpPlayer.classList.toggle('hidden');
+});
+
+/* ── LOADER ── */
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('loader').classList.add('hide');
+    music.volume=0.6;
+    music.play().then(()=>setPlaying(true)).catch(()=>{});
+  },2300);
+});
+
+/* ── SCROLL PROGRESS ── */
+const scrollBar=document.getElementById('scrollBar');
+window.addEventListener('scroll',()=>{
+  scrollBar.style.width=(window.scrollY/(document.body.scrollHeight-innerHeight)*100)+'%';
+});
+
+/* ── SPARKLE TRAIL on mousemove ── */
+let lastSp=0;
+document.addEventListener('mousemove',e=>{
+  const now=Date.now();if(now-lastSp<100)return;lastSp=now;
+  const s=document.createElement('div');
+  s.style.cssText=`position:fixed;pointer-events:none;z-index:9000;left:${e.clientX}px;top:${e.clientY}px;font-size:${9+Math.random()*7}px;animation:sparkAnim .55s ease-out forwards;transform:translate(-50%,-50%);color:hsl(${320+Math.random()*40},90%,70%)`;
+  s.textContent=['·','✦','✧','°'][Math.floor(Math.random()*4)];
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),600);
+});
+
+/* ── SCROLL REVEAL ── */
+function reveal(sel){
+  document.querySelectorAll(sel).forEach(el=>{
+    new IntersectionObserver(entries=>{
+      entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+    },{threshold:.2}).observe(el);
+  });
+}
+reveal('#photoFrame');reveal('#photoCaption');
+reveal('#envTop');reveal('#letterPaper');reveal('#letterSal');reveal('#letterSig');
+reveal('#closingQuote');reveal('#closingSub');reveal('#closingForever');
+
+/* paragraphs staggered */
+document.querySelectorAll('.letter-paragraph').forEach((el,i)=>{
+  new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting) setTimeout(()=>el.classList.add('visible'),i*170); });
+  },{threshold:.12}).observe(el);
+});
+/* timeline staggered */
+document.querySelectorAll('[data-tl]').forEach((el,i)=>{
+  new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting) setTimeout(()=>el.classList.add('visible'),i*140); });
+  },{threshold:.18}).observe(el);
+});
+/* promise cards staggered */
+document.querySelectorAll('[data-pc]').forEach((el,i)=>{
+  new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting) setTimeout(()=>el.classList.add('visible'),i*110); });
+  },{threshold:.2}).observe(el);
+});
+
+/* ── PETAL BURST on photo enter ── */
+function burstPetals(x,y){
+  for(let i=0;i<12;i++){
+    const p=document.createElement('div');
+    const ang=(Math.PI*2/12)*i,dist=65+Math.random()*65;
+    p.style.cssText=`position:fixed;pointer-events:none;z-index:9000;left:${x}px;top:${y}px;font-size:${13+Math.random()*11}px;transition:transform .85s ease-out,opacity .85s ease-out;transform:translate(-50%,-50%);opacity:1`;
+    p.textContent=petalEmojis[Math.floor(Math.random()*petalEmojis.length)];
+    document.body.appendChild(p);
+    requestAnimationFrame(()=>{
+      p.style.transform=`translate(${-50+Math.cos(ang)*dist}%,${-50+Math.sin(ang)*dist}%)`;
+      p.style.opacity='0';
+    });
+    setTimeout(()=>p.remove(),950);
+  }
+new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const r=e.target.getBoundingClientRect();
+      burstPetals(r.left+r.width/2,r.top+r.height/2);
+    }
+  });
+},{threshold:.4}).observe(document.getElementById('photoFrame'));
+
+/* ── HEART RAIN on closing ── */
+new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      for(let i=0;i<32;i++){
+        setTimeout(()=>{
+          const h=document.createElement('div');
+          h.style.cssText=`position:fixed;top:-30px;left:${Math.random()*100}%;font-size:${14+Math.random()*18}px;pointer-events:none;z-index:9000;animation:petalFall ${4+Math.random()*5}s linear forwards;opacity:${.5+Math.random()*.5}`;
+          h.textContent=heartEmoji[Math.floor(Math.random()*heartEmoji.length)];
+          document.body.appendChild(h);
+          setTimeout(()=>h.remove(),10000);
+        },i*180);
+      }
+    }
+  });
+},{threshold:.3}).observe(document.querySelector('.closing-section'));
+
+/* ── HERO TITLE GLOW SHIMMER ── */
+const ht=document.querySelector('.hero-title');
+if(ht) setInterval(()=>{
+  ht.style.textShadow=`0 0 ${40+Math.random()*40}px rgba(255,128,181,${.4+Math.random()*.3}),0 0 ${80+Math.random()*40}px rgba(212,73,138,${.15+Math.random()*.15})`;
+},1800);
+</script>
+</body>
+</html>
+                                    }
